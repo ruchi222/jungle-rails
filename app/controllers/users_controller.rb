@@ -1,5 +1,7 @@
 class UsersController < ApplicationController
+  before_action :set_user, only: [:show, :edit, :update, :destroy]
     def new
+      @user = User.new
     end
   
     def create
@@ -12,6 +14,7 @@ class UsersController < ApplicationController
         redirect_to '/signup'
       end
     end
+    
     
     private
   
