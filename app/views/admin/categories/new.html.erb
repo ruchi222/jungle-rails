@@ -1,0 +1,35 @@
+<section>
+
+  <header>
+    <h1>Admin - New Category</h1>
+  </header>
+
+  <div>
+    <%= link_to 'All Categories', [:admin, :categories], class: 'btn btn-info' %>
+  </div>
+
+  <div>
+    <div>
+      <%= form_for [:admin, @category] do |form| %>
+        <% if form.object.errors.any? %>
+          <div>
+            <strong>The following errors prevented saving:</strong>
+            <ul>
+              <% form.object.errors.full_messages.each do |error| %>
+                <li><%= error %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div>
+          <%= form.label :name %>
+          <%= form.text_field :name, class: 'form-control' %>
+        </div>
+
+        <%= form.submit 'Create Category', class: 'btn btn-primary' %>
+      <% end %>
+    </div>
+  </div>
+
+</section>
