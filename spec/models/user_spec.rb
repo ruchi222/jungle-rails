@@ -2,119 +2,114 @@ require 'rails_helper'
 
 RSpec.describe User, type: :model do
   
-  before(:each) do
-    @user = User.new
-  end
+  subject {
+    described_class.new(
+      first_name: "example", 
+      last_name: "domain", 
+      email: "example@domain.com", 
+      password: "secret", 
+      password_confirmation: "secret"
+    )
+  }
 
-  it 'saves with all fields filled in' do
-    full_user = User.new(first_name: 'a', last_name: 'b', email: 'email@email.com', password: 'apples', password_confirmation: 'apples')
-    full_user.save
-    expect(full_user).to be_valid
-  end
-  
-  it 'is invalid without a first_name' do
-    expect(@user).to_not be_valid
-    expect(@user.errors.messages[:first_name]).to include('can\'t be blank')
-  end
-  
-  it 'is invalid without a last_name' do
-    expect(@user).to_not be_valid
-    expect(@user.errors.messages[:last_name]).to include('can\'t be blank')
-  end
-
-  it 'is invalid without password' do
-    expect(@user).to_not be_valid
-    expect(@user.errors.messages[:password]).to include('can\'t be blank')
-  end
-
-  it 'is invalid if password and password confirmation do not match' do
-    full_user = User.new(first_name: 'a', last_name: 'b', email: 'email@email.com', password: 'apples', password_confirmation: 'apples')
-    full_user2 = User.new(first_name: 'b', last_name: 'a', email: 'email@email.com', password: 'apples', password_confirmation: 'APPLES')
-    full_user.save
-    full_user2.save
-    expect(full_user.password).to eq(full_user.password_confirmation)
-    expect(full_user2.password).to_not eq(full_user2.password_confirmation)
-  end
-
-  it 'is invalid if password is too short' do
-    full_user = User.new(first_name: 'a', last_name: 'b', email: 'email@email.com', password: 'apples', password_confirmation: 'apples')
-    full_user2 = User.new(first_name: 'b', last_name: 'a', email: 'mail@mail.com', password: 'a', password_confirmation: 'a')
-    full_user.save
-    full_user2.save
-    expect(full_user).to be_valid
-    expect(full_user2).to_not be_valid
-    expect(full_user2.errors.messages[:password]).to include("is too short (minimum is 6 characters)")
-    expect(full_user2.errors.messages[:password_confirmation]).to include("is too short (minimum is 6 characters)")
-  end
-
-  it 'is invalid without an email' do
-    expect(@user).to_not be_valid
-    expect(@user.errors.messages[:email]).to include('can\'t be blank')
-  end
-
-  it 'requires a unique email' do
-    full_user1 = User.new(first_name: 'a', last_name: 'b', email: 'email@email.com', password: 'apples', password_confirmation: 'apples')
-    full_user2 = User.new(first_name: 'b', last_name: 'a', email: 'email@email.com', password: 'APPLES', password_confirmation: 'APPLES')
-    full_user1.save
-    full_user2.save
-    expect(full_user1).to be_valid
-    expect(full_user2).to_not be_valid
-    expect(full_user2.errors.messages[:email]).to include('has already been taken')
-  end
-
-  context 'on an existing user' do
-    let(:user) do
-      full_user1 = User.new(first_name: 'a', last_name: 'b', email: 'email@email.com', password: 'apples', password_confirmation: 'apples')
-      full_user1.save
-      User.find full_user1.id
+  describe "Validations" do
+    it "is valid with valid attributes" do
+      expect(subject).to be_valid
+      expect(subject.errors.full_messages).to be_empty
     end
 
-    it "should be valid with no changes" do
-      expect(user).to_not be_valid
+    it "is not valid without first name" do
+      subject.first_name = nil
+      expect(subject).to_not be_valid
+      expect(subject.errors.full_messages).to include ("First name can't be blank")
     end
 
-    it "should not be valid with an empty password" do
-      user.password = user.password_confirmation = ""
-      expect(user).to_not be_valid
+    it "is not valid without last name" do
+      subject.last_name = nil
+      expect(subject).to_not be_valid
+      expect(subject.errors.full_messages).to include ("Last name can't be blank")
     end
 
-    it "should be valid with a new (valid) password" do
-      user.password = user.password_confirmation = "new password"
-      expect(user).to be_valid
+    it "is not valid without an email" do
+      subject.email = nil
+      expect(subject).to_not be_valid
+      expect(subject.errors.full_messages).to include ("Email can't be blank")
+    end
+
+    it "is not valid without pasword" do
+      subject.password = nil
+      expect(subject).to_not be_valid
+      expect(subject.errors.full_messages).to include ("Password can't be blank")
+    end
+
+    it "is not valid without pasword confirmation" do
+      subject.password_confirmation = nil
+      expect(subject).to_not be_valid
+      expect(subject.errors.full_messages).to include ("Password confirmation can't be blank")
+    end
+
+    it "is not valid when password and password_confirmation don't match" do
+      subject.password_confirmation = "notsecret"
+      expect(subject).to_not be_valid
+      expect(subject.errors.full_messages).to include ("Password confirmation doesn't match Password")
+    end
+
+    it "is not valid when email isn't unique (case insensitive)" do
+      same_as_subject = User.create(
+        first_name: "Test", 
+        last_name: "Person", 
+        email: "example@domain.com", 
+        password: "secret", 
+        password_confirmation: "secret"
+      )
+      expect(subject).to_not be_valid
+      expect(subject.errors.full_messages).to include ("Email has already been taken")
+    end
+
+    it "is not valid when password is shorter than 5 characters" do
+      subject.password = "abcd"
+      subject.password_confirmation = "abcd"
+      expect(subject).to_not be_valid
+      expect(subject.errors.full_messages).to include ("Password is too short (minimum is 5 characters)")
+    end
+
+    it "is valid when password is exactly 5 characters" do
+      subject.password = "abcde"
+      subject.password_confirmation = "abcde"
+      expect(subject).to be_valid
+      expect(subject.errors.full_messages).to be_empty
     end
   end
 
-  describe ".authenticate_with_credentials" do
-    
-    it 'should authenticate if password and email are valid' do
-    user = User.new(first_name: 'a', last_name: 'b', email: 'email@email.com', password: 'apples', password_confirmation: 'apples')
-    user.save
-    valid_user = User.authenticate_with_credentials('email@email.com', 'apples')
-
-    expect(valid_user).to eq(user)
+  describe '.authenticate_with_credentials' do
+    it "authenticates when credentials are valid" do
+      subject.save!
+      auth = User.authenticate_with_credentials(subject.email, subject.password)
+      expect(auth).to eq subject
     end
 
-    it 'should not authenticate if password and email are valid' do
-      user = User.new(first_name: 'a', last_name: 'b', email: 'email@email.com', password: 'apples', password_confirmation: 'apples')
-      user.save
-      invalid_user = User.authenticate_with_credentials('notemail@notemail.com', 'apples')
-  
-      expect(invalid_user).to_not eq(user)
+    it "doesn't authenticate when email is incorrect" do
+      subject.save!
+      auth = User.authenticate_with_credentials("other@gmail.com", subject.password)
+      expect(auth).to eq nil
     end
 
-    it 'should authenticate if user adds uppercase letters to their email' do
-      user = User.new(first_name: 'a', last_name: 'b', email: 'email@email.com', password: 'apples', password_confirmation: 'apples')
-      user.save
-      valid_user = User.authenticate_with_credentials('EMAIL@email.com', 'apples')
-      expect(valid_user).to eq(user)
+    it "doesn't authenticate when password is incorrect" do
+      subject.save!
+      auth = User.authenticate_with_credentials(subject.email, "forgot")
+      expect(auth).to eq nil
     end
 
-    it 'should authenticate if user adds spaces to beginning or end of email' do
-      user = User.new(first_name: 'a', last_name: 'b', email: 'email@email.com', password: 'apples', password_confirmation: 'apples')
-      user.save
-      valid_user = User.authenticate_with_credentials(' email@email.com ', 'apples')
-      expect(valid_user).to eq(user)
+    it "authenticates when email is correct but contains whitespace around it" do
+      subject.save!
+      auth = User.authenticate_with_credentials("   " + subject.email + "  ", subject.password)
+      expect(auth).to eq subject
+    end
+
+    it "authenticates when email is correct but in the wrong case" do
+      subject.save!
+      auth = User.authenticate_with_credentials("EXAMPLe@DOMAIN.CoM", subject.password)
+      expect(auth).to eq subject
     end
   end
 end
-
