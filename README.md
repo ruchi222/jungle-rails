@@ -10,9 +10,9 @@ a user must sign in and admin users have an extra step of authentication to acce
 
 ## Screenshots
 
-!["Sold Out"]("https://github.com/ruchi222/jungle-rails/blob/master/docs/soldout.png")
-!["Cart"]("https://github.com/ruchi222/jungle-rails/blob/master/docs/cart.png")
-!["Products"]("https://github.com/ruchi222/jungle-rails/blob/master/docs/products.png")
+!["Sold Out"](https://github.com/ruchi222/jungle-rails/blob/master/docs/soldout.png)
+!["Cart"](https://github.com/ruchi222/jungle-rails/blob/master/docs/cart.png)
+!["Products"](https://github.com/ruchi222/jungle-rails/blob/master/docs/products.png)
 
 
 ## Additional Steps for Apple M1 Machines
