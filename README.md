@@ -1,6 +1,19 @@
 # Jungle
 
 A mini e-commerce application built with Rails 4.2 for purposes of teaching Rails by example.
+Jungle was built with users in mind from the main catalog to each products detail page. 
+Some special features of Jungle is its email confirmation capabilities, and authentication processes.
+
+-> Jungle is set up with Action Mailer to send out simple email confirmations to users upon purchase.
+-> While users do not need to be signed in to view the products catalog and respective detail pages, 
+a user must sign in and admin users have an extra step of authentication to access the create product and create category pages.
+
+## Screenshots
+
+!["Sold Out"]()
+!["Cart"]()
+!["Products"]()
+
 
 ## Additional Steps for Apple M1 Machines
 
